@@ -3,9 +3,11 @@ package main
 import (
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"github.com/speanut-land/gdou-server/models"
 	"github.com/speanut-land/gdou-server/pkg/logging"
 	"github.com/speanut-land/gdou-server/pkg/redis"
 	"github.com/speanut-land/gdou-server/pkg/setting"
+	"github.com/speanut-land/gdou-server/pkg/util"
 	"github.com/speanut-land/gdou-server/routers"
 	"log"
 	"net/http"
@@ -13,9 +15,10 @@ import (
 
 func init() {
 	setting.Setup()
-	//models.Setup()
-	redis.SetUp()
+	models.Setup()
+	_ = redis.SetUp()
 	logging.Setup()
+	util.Setup()
 }
 func main() {
 	//设置gin框架的运行模式
