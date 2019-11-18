@@ -1,0 +1,48 @@
+definitions:
+  app.Response:
+    properties:
+      code:
+        type: integer
+      data:
+        type: object
+      msg:
+        type: string
+    type: object
+info:
+  contact: {}
+  license: {}
+paths:
+  /register:
+    post:
+      parameters:
+      - description: Username
+        in: body
+        name: username
+        required: true
+        schema:
+          type: string
+      - description: Password
+        in: body
+        name: password
+        required: true
+        schema:
+          type: string
+      - description: Telephone
+        in: body
+        name: telephone
+        required: true
+        schema:
+          type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/app.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/app.Response'
+      summary: 注册用户
+swagger: "2.0"

@@ -1,0 +1,76 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "contact": {},
+        "license": {}
+    },
+    "paths": {
+        "/register": {
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "注册用户",
+                "parameters": [
+                    {
+                        "description": "Username",
+                        "name": "username",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "description": "Password",
+                        "name": "password",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "description": "Telephone",
+                        "name": "telephone",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/app.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/app.Response"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "app.Response": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "integer"
+                },
+                "data": {
+                    "type": "object"
+                },
+                "msg": {
+                    "type": "string"
+                }
+            }
+        }
+    }
+}

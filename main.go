@@ -23,7 +23,6 @@ func init() {
 func main() {
 	//设置gin框架的运行模式
 	gin.SetMode(setting.ServerSetting.RunMode)
-
 	routersInit := routers.InitRouter()
 	readTimeout := setting.ServerSetting.ReadTimeout
 	writeTimeout := setting.ServerSetting.WriteTimeout
