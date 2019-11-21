@@ -29,7 +29,7 @@ type UserForm struct {
 // @Param code body string true "验证码"
 // @Success 200 {object} app.Response
 // @Failure 500 {object} app.Response
-// @Router /register [post]
+// @Router /user/register [post]
 func Register(c *gin.Context) {
 	var (
 		appG = app.Gin{C: c}
@@ -40,8 +40,8 @@ func Register(c *gin.Context) {
 		appG.Response(httpCode, errCode, false, nil)
 		return
 	}
-	if redis.Exists(form.Telephone) {
-		data, err := redis.Get(form.Telephone)
+	if redis.Exists("register" + form.Telephone) {
+		data, err := redis.Get("register" + form.Telephone)
 		temp := string(data)
 		tempData := temp[1 : len(temp)-1]
 		if err != nil {
@@ -76,7 +76,7 @@ func Register(c *gin.Context) {
 		return
 	}
 
-	_, err = redis.Delete(form.Telephone)
+	_, err = redis.Delete("register" + form.Telephone)
 	if err != nil {
 		logging.Info(err)
 	}
@@ -97,7 +97,7 @@ type UserLoginForm struct {
 // @Param username body string true "用户名"
 // @Param password body string true "用户密码"
 // @Success 200 {object} app.Response
-// @Router /login [post]
+// @Router /user/login [post]
 func Login(c *gin.Context) {
 	var (
 		appG = app.Gin{C: c}
@@ -129,5 +129,71 @@ func Login(c *gin.Context) {
 	appG.Response(http.StatusOK, e.SUCCESS, true, map[string]string{
 		"token": token,
 	})
+}
 
+type UserResetPasswordForm struct {
+	Telephone string `form:"telephone" valid:"Required;MaxSize(11)"`
+	Password  string `form:"password" valid:"Required;MaxSize(20)"`
+	Code      string `form:"code" valid:"Required;MaxSize(6)"`
+}
+
+// @Summary 重置用户密码
+// @Tags 用户接口
+// @Produce json
+// @Param telephone body string true "手机号"
+// @Param code body string true "验证码"
+// @Param password body string true "用户密码"
+// @Success 200 {object} app.Response
+// @Failure 500 {object} app.Response
+// @Router /user/resetPassword [post]
+func ResetPassword(c *gin.Context) {
+	var (
+		appG = app.Gin{C: c}
+		form UserResetPasswordForm
+	)
+	httpCode, errCode := app.BindAndValid(c, &form)
+	if errCode != e.SUCCESS {
+		appG.Response(httpCode, errCode, false, nil)
+		return
+	}
+	if redis.Exists("resetPassword" + form.Telephone) {
+		data, err := redis.Get("resetPassword" + form.Telephone)
+		temp := string(data)
+		tempData := temp[1 : len(temp)-1]
+		if err != nil {
+			logging.Info(err)
+			appG.Response(http.StatusInternalServerError, e.ERROR, false, nil)
+			return
+		} else if !strings.EqualFold(form.Code, tempData) {
+			appG.Response(http.StatusOK, e.ERROR_CODE, false, nil)
+			return
+		}
+	} else {
+		appG.Response(http.StatusOK, e.ERROR_CODE, false, nil)
+		return
+	}
+	userService := user_service.User{
+		Password:  form.Password,
+		Telephone: form.Telephone,
+	}
+	errCode = userService.ExistByTelephone()
+	if errCode == e.ERROR {
+		appG.Response(http.StatusInternalServerError, errCode, false, nil)
+		return
+	} else {
+		if errCode != e.ERROR_TELEPHONE_USED {
+			appG.Response(http.StatusOK, errCode, false, nil)
+			return
+		}
+	}
+	err := userService.ResetPassword()
+	if err != nil {
+		appG.Response(http.StatusInternalServerError, e.ERROR_ADD_USER_FAIL, false, nil)
+		return
+	}
+	_, err = redis.Delete("resetPassword" + form.Telephone)
+	if err != nil {
+		logging.Info(err)
+	}
+	appG.Response(http.StatusOK, e.SUCCESS, true, nil)
 }

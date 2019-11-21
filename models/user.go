@@ -3,6 +3,7 @@ package models
 import (
 	"github.com/jinzhu/gorm"
 	"github.com/speanut-land/gdou-server/pkg/e"
+	"github.com/speanut-land/gdou-server/pkg/logging"
 	"regexp"
 )
 
@@ -30,7 +31,18 @@ func ExistUserByName(name string) (bool, error) {
 	return false, nil
 }
 
-// AddUser Add a User
+// 重置密码
+func ResetPassword(telephone string, password string) error {
+	var user User
+	err := db.Model(&user).Where("telephone = ?", telephone).Update("password", password).Error
+	if err != nil {
+		logging.Info(err)
+		return err
+	}
+	return nil
+}
+
+// 添加一个用户
 func AddUser(username string, password string, telephone string) error {
 	user := User{
 		Username:  username,
@@ -76,7 +88,7 @@ func IsTelephoneUsable(phone string) int {
 			return e.ERROR
 		}
 		if err == gorm.ErrRecordNotFound {
-			return 0
+			return e.ERROR_TELEPHONE_UNREGISTER
 		}
 		if user.ID > 0 {
 			return e.ERROR_TELEPHONE_USED

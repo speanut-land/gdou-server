@@ -26,13 +26,40 @@ func Register(c *gin.Context) {
 		appG.Response(http.StatusInternalServerError, errCode, false, nil)
 		return
 	} else {
-		if errCode != 0 {
+		if errCode != e.ERROR_TELEPHONE_UNREGISTER {
 			appG.Response(http.StatusOK, errCode, false, nil)
 			return
 		}
 	}
 	code := util.CreateCaptcha()
-	_ = redis.Set(telephone, code, 60*5)
+	_ = redis.Set("register"+telephone, code, 60*5)
+	defer sms.SendSms(telephone, code)
+	appG.Response(http.StatusOK, e.SUCCESS, true, nil)
+}
+
+// @Summary 发送重置密码的短信验证码
+// @Tags 短信接口
+// @Produce json
+// @Param telephone body string true "Telephone"
+//@Success 200 {object} app.Response
+//@Failure 500 {object} app.Response
+// @Router /sendCode/resetPassword [post]
+func ResetPassword(c *gin.Context) {
+	appG := app.Gin{C: c}
+	telephone := c.PostForm("telephone")
+	errCode := models.IsTelephoneUsable(telephone)
+	if errCode == e.ERROR {
+		appG.Response(http.StatusInternalServerError, errCode, false, nil)
+		return
+	} else {
+		if errCode != e.ERROR_TELEPHONE_USED {
+			appG.Response(http.StatusOK, errCode, false, nil)
+			return
+		}
+	}
+	code := util.CreateCaptcha()
+	println("resetPassword"+telephone, code)
+	_ = redis.Set("resetPassword"+telephone, code, 60*5)
 	defer sms.SendSms(telephone, code)
 	appG.Response(http.StatusOK, e.SUCCESS, true, nil)
 }

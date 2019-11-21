@@ -15,11 +15,17 @@ func InitRouter() *gin.Engine {
 	r.Use(gin.Recovery())
 
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
-	r.POST("/register", api.Register)
-	r.POST("/login", api.Login)
+	user := r.Group("/user")
+	{
+		user.POST("/register", api.Register)
+		user.POST("/login", api.Login)
+		user.POST("/resetPassword", api.ResetPassword)
+	}
+
 	sendCode := r.Group("/sendCode")
 	{
 		sendCode.POST("/register", sendcode.Register)
+		sendCode.POST("/resetPassword", sendcode.ResetPassword)
 	}
 	return r
 }
