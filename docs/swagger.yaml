@@ -7,26 +7,83 @@ definitions:
         type: object
       msg:
         type: string
+      success:
+        type: boolean
     type: object
 info:
   contact: {}
   license: {}
 paths:
-  /register:
+  /login:
     post:
+      description: 请登录后将token放在请求头上
       parameters:
-      - description: Username
+      - description: 用户名
         in: body
         name: username
         required: true
         schema:
           type: string
-      - description: Password
+      - description: 用户密码
         in: body
         name: password
         required: true
         schema:
           type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/app.Response'
+      summary: 用户登录
+      tags:
+      - 用户接口
+  /register:
+    post:
+      parameters:
+      - description: 用户名
+        in: body
+        name: username
+        required: true
+        schema:
+          type: string
+      - description: 密码
+        in: body
+        name: password
+        required: true
+        schema:
+          type: string
+      - description: 手机号
+        in: body
+        name: telephone
+        required: true
+        schema:
+          type: string
+      - description: 验证码
+        in: body
+        name: code
+        required: true
+        schema:
+          type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/app.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/app.Response'
+      summary: 注册用户
+      tags:
+      - 用户接口
+  /sendCode/register:
+    post:
+      parameters:
       - description: Telephone
         in: body
         name: telephone
@@ -44,5 +101,7 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/app.Response'
-      summary: 注册用户
+      summary: 发送注册短信验证码
+      tags:
+      - 短信接口
 swagger: "2.0"

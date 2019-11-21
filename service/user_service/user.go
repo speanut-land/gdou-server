@@ -17,3 +17,7 @@ func (u *User) ExistByName() (bool, error) {
 func (u *User) Add() error {
 	return models.AddUser(u.Username, u.Password, u.Telephone)
 }
+
+func (u *User) Login() (bool, error) {
+	return models.CheckLogin(u.Username, u.Password)
+}

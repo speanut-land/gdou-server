@@ -56,6 +56,14 @@ type Redis struct {
 
 var RedisSetting = &Redis{}
 
+type AliAccess struct {
+	AccessKeyId     string
+	AccessKeySecret string
+	SignName        string
+	TemplateCode    string
+}
+
+var AliAccessSetting = &AliAccess{}
 var cfg *ini.File
 
 //初始化配置文件
@@ -69,6 +77,7 @@ func Setup() {
 	mapTo("server", ServerSetting)
 	mapTo("database", DatabaseSetting)
 	mapTo("redis", RedisSetting)
+	mapTo("ali", AliAccessSetting)
 
 	AppSetting.ImageMaxSize = AppSetting.ImageMaxSize * 1024 * 1024
 	ServerSetting.ReadTimeout = ServerSetting.ReadTimeout * time.Second
