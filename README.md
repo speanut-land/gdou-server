@@ -3,7 +3,7 @@
 
 ## 安装
 ```
-$ go get github.com/EDDYCJY/go-gin-example
+$ go get github.com/speanut-land/gdou-server
 ```
 
 ## 如何运行
